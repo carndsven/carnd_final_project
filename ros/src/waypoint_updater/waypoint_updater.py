@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
@@ -27,8 +27,8 @@ class WaypointUpdater(object):
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
-        rospy.Subscriber('/current_velocity', Twist, self.velocity_cb)
+        #rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
         # Add other member variables you need below
         self.max_lookahead = rospy.get_param('~max_lookahead', 200)
@@ -54,7 +54,7 @@ class WaypointUpdater(object):
                 closest_waypoint_idx=self.get_closest_waypoint_idx()
                 #publish waypoints
                 self.publish_waypoints(closest_waypoint_idx)
-                rate sleep()
+                rate.sleep()
 
     #function to get index of closest waypoint 
     def get_closest_waypoint_idx(self):
