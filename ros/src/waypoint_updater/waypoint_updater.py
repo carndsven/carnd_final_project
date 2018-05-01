@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import PoseStamped, TwistStamped
-from styx_msgs.msg import Lane, Waypoint
+from styx_msgs.msg import Lane, Waypoint, TrafficLight, TLStatus
 
 import math
 
@@ -27,8 +27,11 @@ class WaypointUpdater(object):
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-        #rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        rospy.Subscriber('/all_traffic_waypoint', TLStatus, self.traffic_state_cb)
+        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
+
+        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # Add other member variables you need below
         self.max_lookahead = rospy.get_param('~max_lookahead', 200)
@@ -45,16 +48,16 @@ class WaypointUpdater(object):
         #use loop to get control over publisher frequency
         self.loop()
 
-    def loop(self):
+#    def loop(self):
         #run with 50Hz
-        rate=rospy.Rate(50)
-        while not rospy.is_shutdown():
-            if self.pose and self.base_waypoints:
-                #get closest waypoint
-                closest_waypoint_idx=self.get_closest_waypoint_idx()
-                #publish waypoints
-                self.publish_waypoints(closest_waypoint_idx)
-                rate.sleep()
+#        rate=rospy.Rate(50)
+#        while not rospy.is_shutdown():
+#            if self.pose and self.base_waypoints:
+#                #get closest waypoint
+#                closest_waypoint_idx=self.get_closest_waypoint_idx()
+#                #publish waypoints
+#                self.publish_waypoints(closest_waypoint_idx)
+#                rate.sleep()
 
     #function to get index of closest waypoint 
     def get_closest_waypoint_idx(self):
@@ -76,9 +79,10 @@ class WaypointUpdater(object):
             closest_idx=(closest_idx+1)%len(self.waypoints_2d)
             return closest_idx
 		
-    def publish_waypoints(self, closest_idx):
+    def publish_waypoints(self):
         lane = self.generate_lane()
         self.final_waypoints_pub.publish(lane)
+        rospy.loginfo("sent a new lane")
 
     def generate_lane(self):
         lane = Lane()
@@ -119,21 +123,35 @@ class WaypointUpdater(object):
         return speed_wps
 
     def pose_cb(self, msg):
+        rospy.loginfo("received a pose")
         self.pose=msg
+        self.publish_waypoints()
 
     def waypoints_cb(self, waypoints):
+        rospy.loginfo("received waypoints")
         #store received waypoints in member
         self.base_waypoints = waypoints
         #use KDtree to find LOOKAHEAD_WPS
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoint]
             self.waypoint_tree = KDTree(self.waypoints_2d)
+        self.publish_waypoints()
 
     def traffic_cb(self, msg):
+        rospy.loginfo("received a stopline")
         self.stopline_wp = msg
+        self.publish_waypoints()
+
+    def traffic_state_cb(self, tl_status):
+        rospy.loginfo("received a traffic light state")
+        if tl.status.state == TrafficLight.RED or tl_status.state == TrafficLight.YELLOW:
+            self.stopline_wp = -1
+        self.publish_waypoints()
 
     def velocity_cb(self, msg):
+        rospy.loginfo("received a velocity")
         self.velocity = msg
+        self.publish_waypoints()
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
