@@ -147,7 +147,7 @@ class TLDetector(object):
         # List of positions that correspond to the line to stop in front of for a given intersection
         #TODO find the closest visible traffic light (if one exists)
 
-if self.pose:
+        if self.pose:
             car_index = self.get_closest_waypoint(self.pose.pose.position)
             car_position = self.waypoints.waypoints[car_index].pose.pose.position
             # rospy.loginfo("Car Position:{}".format(car_position))
