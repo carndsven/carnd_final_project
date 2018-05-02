@@ -3,6 +3,9 @@
 import rospy
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint, TrafficLight, TLStatus
+from std_msgs.msg import Int32
+from scipy.spatial import KDTree
+import numpy as np
 
 import math
 
@@ -48,16 +51,14 @@ class WaypointUpdater(object):
         #use loop to get control over publisher frequency
         self.loop()
 
-#    def loop(self):
+    def loop(self):
         #run with 50Hz
-#        rate=rospy.Rate(50)
-#        while not rospy.is_shutdown():
-#            if self.pose and self.base_waypoints:
-#                #get closest waypoint
-#                closest_waypoint_idx=self.get_closest_waypoint_idx()
-#                #publish waypoints
-#                self.publish_waypoints(closest_waypoint_idx)
-#                rate.sleep()
+        rate=rospy.Rate(50)
+        while not rospy.is_shutdown():
+            if self.pose and self.base_waypoints and self.waypoint_tree:
+                #publish waypoints
+                self.publish_waypoints()
+            rate.sleep()
 
     #function to get index of closest waypoint 
     def get_closest_waypoint_idx(self):
@@ -70,34 +71,30 @@ class WaypointUpdater(object):
         prev_coord=self.waypoints_2d[closest_idx-1]
 		
         # equation for hyperplane through closest_coords
-        cl_vec=np.arry(closest_coord)
+        cl_vec=np.array(closest_coord)
         prev_vec=np.array(prev_coord)
         pos_vec=np.array([x,y])
         val=np.dot(cl_vec-prev_vec,pos_vec-cl_vec)
         #behind the car
         if (val>0):
             closest_idx=(closest_idx+1)%len(self.waypoints_2d)
-            return closest_idx
+        return closest_idx
 		
     def publish_waypoints(self):
         lane = self.generate_lane()
         self.final_waypoints_pub.publish(lane)
-        rospy.loginfo("sent a new lane")
 
     def generate_lane(self):
         lane = Lane()
 
         nn_idx = self.get_closest_waypoint_idx()
         look_ahead = nn_idx + self.max_lookahead
-        base_wps = self.base_lane.waypoints[nn_idx : look_ahead]
+        base_wps = self.base_waypoints.waypoints[nn_idx : look_ahead]
 
         if self.stopline_wp == -1 or self.stopline_wp >= look_ahead:
-            if self.velocity.linear.x / base_waypoints[0].twist.twist.linear.x < 0.5:
-                lane.waypoints = accelerate(base_waypoints)
-            else:
-                lane.waypoints = base_waypoints
+            lane.waypoints = base_wps
         else:
-            lane.waypoints = self.decelerate(base_waypoints, nn_idx)
+            lane.waypoints = self.decelerate(base_wps, nn_idx)
 
         return lane
 
@@ -123,35 +120,27 @@ class WaypointUpdater(object):
         return speed_wps
 
     def pose_cb(self, msg):
-        rospy.loginfo("received a pose")
         self.pose=msg
-        self.publish_waypoints()
 
     def waypoints_cb(self, waypoints):
-        rospy.loginfo("received waypoints")
         #store received waypoints in member
         self.base_waypoints = waypoints
         #use KDtree to find LOOKAHEAD_WPS
         if not self.waypoints_2d:
-            self.waypoints_2d = [[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoint]
+            self.waypoints_2d = [[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
             self.waypoint_tree = KDTree(self.waypoints_2d)
-        self.publish_waypoints()
 
     def traffic_cb(self, msg):
         rospy.loginfo("received a stopline")
         self.stopline_wp = msg
-        self.publish_waypoints()
 
     def traffic_state_cb(self, tl_status):
         rospy.loginfo("received a traffic light state")
         if tl.status.state == TrafficLight.RED or tl_status.state == TrafficLight.YELLOW:
             self.stopline_wp = -1
-        self.publish_waypoints()
 
     def velocity_cb(self, msg):
-        rospy.loginfo("received a velocity")
         self.velocity = msg
-        self.publish_waypoints()
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later

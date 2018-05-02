@@ -59,7 +59,7 @@ class DBWNode(object):
         # TODO: Subscribe to all the topics you need to
 
 	self.controller = Controller(vehicle_mass=vehicle_mass,
-				     fuel_capacity=Fuel_capacity,
+				     fuel_capacity=fuel_capacity,
 				     brake_deadband=brake_deadband,
                                      decel_limit=decel_limit,
 				     accel_limit=accel_limit,
@@ -70,7 +70,7 @@ class DBWNode(object):
 				     max_steer_angle=max_steer_angle)
 
 	rospy.Subscriber('/dbw_enabled',Bool,self.dbw_enabled_cb)
-	rospy.Subscriber('/twist_cmd',TwistStamped,self.dbw_twist_cb)
+	rospy.Subscriber('/twist_cmd',TwistStamped,self.twist_cb)
 	rospy.Subscriber('/current_velocity',TwistStamped,self.velocity_cb)
 	
 	self.current_vel = None
