@@ -111,12 +111,14 @@ class WaypointUpdater(object):
             look_ahead = self.stopline_wp
         base_wps = self.base_waypoints.waypoints[nn_idx : look_ahead]
 
-        if self.stopline_wp == -1 or self.stopline_wp > look_ahead:
-            lane.waypoints = base_wps
+        if 2 <= len(base_wps):
+            if self.stopline_wp == -1 or self.stopline_wp > look_ahead:
+                lane.waypoints = base_wps
+            else:
+                lane.waypoints = self.decelerate(base_wps, nn_idx)
+            return lane, self.distance_to_trajectory(self.pose, base_wps[0].pose.pose.position, base_wps[1].pose.pose.position)
         else:
-            lane.waypoints = self.decelerate(base_wps, nn_idx)
-
-        return lane, self.distance_to_trajectory(self.pose, base_wps[0].pose.pose.position, base_wps[1].pose.pose.position)
+            return lane, 0.0
 
     def decelerate(self, waypoints, idx):
         speed_wps = []
