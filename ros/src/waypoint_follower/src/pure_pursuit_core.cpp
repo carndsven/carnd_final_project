@@ -234,6 +234,9 @@ bool PurePursuit::verifyFollowing() const
   double a = 0;
   double b = 0;
   double c = 0;
+  ROS_INFO("wp1: x=%1f, y=%1f", current_waypoints_.getWaypointPosition(1).x, current_waypoints_.getWaypointPosition(1).y);
+  ROS_INFO("wp2: x=%1f, y=%1f", current_waypoints_.getWaypointPosition(2).x, current_waypoints_.getWaypointPosition(2).y);
+  ROS_INFO(" cp: x=%1f, y=%1f", current_pose_.pose.position.x, current_pose_.pose.position.y);
   getLinearEquation(current_waypoints_.getWaypointPosition(1), current_waypoints_.getWaypointPosition(2), &a, &b, &c);
   double displacement = getDistanceBetweenLineAndPoint(current_pose_.pose.position, a, b, c);
   double relative_angle = getRelativeAngle(current_waypoints_.getWaypointPose(1), current_pose_.pose);
@@ -259,7 +262,7 @@ geometry_msgs::Twist PurePursuit::calcTwist(double curvature, double cmd_velocit
   twist.linear.x = cmd_velocity;
   if (!following_flag)
   {
-    //ROS_ERROR_STREAM("Not following");
+    ROS_ERROR_STREAM("Not following");
     twist.angular.z = current_velocity_.twist.linear.x * curvature;
   }
   else
