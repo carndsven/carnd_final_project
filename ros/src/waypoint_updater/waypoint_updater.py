@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import PoseStamped, TwistStamped
-from styx_msgs.msg import Lane, Waypoint, TrafficLight, TLStatus
+from styx_msgs.msg import Lane, Waypoint, TrafficLight
 from std_msgs.msg import Int32, Float32
 from scipy.spatial import KDTree
 import numpy as np
@@ -30,7 +30,6 @@ class WaypointUpdater(object):
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-        rospy.Subscriber('/all_traffic_waypoint', TLStatus, self.traffic_state_cb)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
@@ -108,9 +107,11 @@ class WaypointUpdater(object):
 
         nn_idx = self.get_closest_waypoint_idx()
         look_ahead = nn_idx + self.max_lookahead
+        if self.stopline_wp != -1 and self.stopline_wp <= look_ahead:
+            look_ahead = self.stopline_wp
         base_wps = self.base_waypoints.waypoints[nn_idx : look_ahead]
 
-        if self.stopline_wp == -1 or self.stopline_wp >= look_ahead:
+        if self.stopline_wp == -1 or self.stopline_wp > look_ahead:
             lane.waypoints = base_wps
         else:
             lane.waypoints = self.decelerate(base_wps, nn_idx)
@@ -146,13 +147,7 @@ class WaypointUpdater(object):
             self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
-        rospy.loginfo("received a stopline")
-        self.stopline_wp = msg
-
-    def traffic_state_cb(self, tl_status):
-        rospy.loginfo("received a traffic light state")
-        if tl.status.state == TrafficLight.RED or tl_status.state == TrafficLight.YELLOW:
-            self.stopline_wp = -1
+        self.stopline_wp = msg.data
 
     def velocity_cb(self, msg):
         self.velocity = msg
