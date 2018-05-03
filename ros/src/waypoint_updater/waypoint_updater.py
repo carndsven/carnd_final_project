@@ -3,7 +3,7 @@
 import rospy
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint, TrafficLight, TLStatus
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, Float32
 from scipy.spatial import KDTree
 import numpy as np
 
@@ -35,6 +35,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
+        self.distance_pub = rospy.Publisher('gap_to_trajectory', Float32, queue_size=1)
 
         # Add other member variables you need below
         self.max_lookahead = rospy.get_param('~max_lookahead', 200)
@@ -52,12 +53,9 @@ class WaypointUpdater(object):
         self.loop()
 
     def loop(self):
-        #run with 50Hz
-        rate=rospy.Rate(50)
+        #run with 1Hz
+        rate=rospy.Rate(1)
         while not rospy.is_shutdown():
-            if self.pose and self.base_waypoints and self.waypoint_tree:
-                #publish waypoints
-                self.publish_waypoints()
             rate.sleep()
 
     #function to get index of closest waypoint 
@@ -75,14 +73,35 @@ class WaypointUpdater(object):
         prev_vec=np.array(prev_coord)
         pos_vec=np.array([x,y])
         val=np.dot(cl_vec-prev_vec,pos_vec-cl_vec)
-        #behind the car
+        # behind the car
         if (val>0):
             closest_idx=(closest_idx+1)%len(self.waypoints_2d)
         return closest_idx
 		
     def publish_waypoints(self):
-        lane = self.generate_lane()
-        self.final_waypoints_pub.publish(lane)
+        if self.pose and self.base_waypoints and self.waypoint_tree:
+            lane, delta = self.generate_lane()
+            self.final_waypoints_pub.publish(lane)
+            self.distance_pub.publish(delta)
+
+    def distance_to_trajectory(self, point, start, end):
+        p1 = np.array([start.x, start.y])
+        p2 = np.array([end.x, end.y])
+        p = np.array([point.pose.position.x, point.pose.position.y])
+
+        # normalize to p
+        p1 = p1 - p
+        p2 = p2 - p
+        p = np.array([0., 0.])
+
+        # calculate the side
+        side = -p1[0] * (p2[1] - p1[1]) + p1[1] * (p2[0] - p1[0])
+        # calculate the distance
+        dist = np.linalg.norm(np.cross(p2-p1, p1-p))/np.linalg.norm(p2-p1)
+
+        if 0. > side:
+            dist *= -1.
+        return dist
 
     def generate_lane(self):
         lane = Lane()
@@ -96,12 +115,7 @@ class WaypointUpdater(object):
         else:
             lane.waypoints = self.decelerate(base_wps, nn_idx)
 
-        return lane
-
-    def accelerate(self, waypoints):
-        # TODO find destination for max speed
-        # TODO calculate speed based on acceleration
-        return waypoints
+        return lane, self.distance_to_trajectory(self.pose, base_wps[0].pose.pose.position, base_wps[1].pose.pose.position)
 
     def decelerate(self, waypoints, idx):
         speed_wps = []
@@ -121,12 +135,13 @@ class WaypointUpdater(object):
 
     def pose_cb(self, msg):
         self.pose=msg
+        self.publish_waypoints()
 
     def waypoints_cb(self, waypoints):
         #store received waypoints in member
-        self.base_waypoints = waypoints
         #use KDtree to find LOOKAHEAD_WPS
         if not self.waypoints_2d:
+            self.base_waypoints = waypoints
             self.waypoints_2d = [[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
             self.waypoint_tree = KDTree(self.waypoints_2d)
 
