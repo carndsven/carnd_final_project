@@ -106,7 +106,7 @@ class DBWNode(object):
     def loop(self):
         rate = rospy.Rate(self.update_rate)
         while not rospy.is_shutdown():
-            if not None in (self.current_vel,self.linear_vel, self.angular_vel, self.distance):
+            if not None in (self.current_vel, self.linear_vel, self.angular_vel, self.distance):
                 self.throttle,self.brake,self.steering = self.controller.control(self.current_vel,
                                                                                  self.dbw_enabled,
                                                                                  self.linear_vel,
@@ -130,24 +130,26 @@ class DBWNode(object):
         self.current_vel = msg.twist.linear.x
 
     def publish(self, throttle, brake, steer):
-        if brake == 0. and throttle >= 0.:
-            tcmd = ThrottleCmd()
-            tcmd.enable = True
-            tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
-            tcmd.pedal_cmd = throttle
-            self.throttle_pub.publish(tcmd)
+        tcmd = ThrottleCmd()
+        tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
+        tcmd.pedal_cmd = throttle
+        tcmd.enable = True
+        if brake != 0.:
+            tcmd.enable = False
+        self.throttle_pub.publish(tcmd)
 
         scmd = SteeringCmd()
         scmd.enable = True
         scmd.steering_wheel_angle_cmd = steer
         self.steer_pub.publish(scmd)
-    
-        if brake >= 0. and throttle == 0.:
-            bcmd = BrakeCmd()
-            bcmd.enable = True
-            bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
-            bcmd.pedal_cmd = brake
-            self.brake_pub.publish(bcmd)
+
+        bcmd = BrakeCmd()
+        bcmd.enable = True
+        bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
+        bcmd.pedal_cmd = brake 
+        if brake == 0.:
+            bcmd.enable = False
+        self.brake_pub.publish(bcmd)
 
 
 if __name__ == '__main__':
