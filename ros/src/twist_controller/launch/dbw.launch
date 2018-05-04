@@ -15,12 +15,12 @@
 
         <!-- controller configuration commands -->
         <param name="update_rate" value="50" />
-        <param name="steering/Kp" value=".4" />
+        <param name="steering/Kp" value="1." />
         <param name="steering/Ki" value="0." />
-        <param name="steering/Kd" value=".5" />
-        <param name="steering/ratio" value=".1" />
-        <param name="throttle/Kp" value=".3" />
-        <param name="throttle/Ki" value=".1" />
-        <param name="throttle/Kd" value=".0" />
+        <param name="steering/Kd" value=".1" />
+        <param name="steering/ratio" value=".9" />
+        <param name="throttle/Kp" value=".1" />
+        <param name="throttle/Ki" value=".01" />
+        <param name="throttle/Kd" value=".03" />
     </node>
 </launch>

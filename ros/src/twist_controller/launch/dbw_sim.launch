@@ -14,13 +14,14 @@
         <param name="max_steer_angle" value="8." />
 
         <!-- controller configuration commands -->
-        <param name="update_rate" value="20" />
+        <param name="update_rate" value="50" />
         <param name="steering/Kp" value="1." />
         <param name="steering/Ki" value="0." />
         <param name="steering/Kd" value=".1" />
         <param name="steering/ratio" value=".9" />
-        <param name="throttle/Kp" value=".15" />
+        <param name="throttle/Kp" value=".1" />
         <param name="throttle/Ki" value=".01" />
-        <param name="throttle/Kd" value=".02" />
+        <param name="throttle/Kd" value=".03" />
     </node>
 </launch>
+

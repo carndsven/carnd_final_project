@@ -15,7 +15,7 @@ class Controller(object):
         self.yaw_controller = YawController(wheel_base,steer_ratio,0.1,max_lat_accel,max_steer_angle)
    
         mn = 0.   # minimum throttle value
-        mx = 0.2  # maximum throttle value
+        mx = 0.5  # maximum throttle value
         self.throttle_controller = PID(kp_throttle,ki_throttle,kd_throttle,mn,mx)
         band = 4.   # max steering value
         self.steering_controller = PID(kp_steer, ki_steer, kd_steer, -band, band)
@@ -77,11 +77,10 @@ class Controller(object):
             throttle = 0
             brake = 400 # N*.m to hold the car in place if we are stopped at light . Acceleration < 1m/s^2
 
-        elif throttle < 0.1 and vel_error < 0:
-            throttle = 0
+        if current_vel > linear_vel:
             decel = max(vel_error, self.decel_limit)
             brake = abs(decel)*self.vehicle_mass * self.wheel_radius   # Torque N*m
         return throttle, brake, steering 
 
 
-  
+
