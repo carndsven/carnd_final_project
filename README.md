@@ -1,15 +1,15 @@
 ## Capstone Project Team DrivingCarla
 
-###Teammembers:
+### Teammembers:
 
 * Sven-Garrit Czarnian ([Sven-Garrit.Czarnian@hella.com](Sven-Garrit.Czarnian@hella.com))
 * Tina Wein ([tina.wein@hella.com](tina.wein@hella.com))
 * Thomas Götz ([Thomas.Goetz@tgoetz.net](Thomas.Goetz@tgoetz.net))
-* Rohan Maan ([rohanmaan62@gmail.com](rohanmaan62@gmail.com))
+* Jyoti Nayak ([jyotinayak1976@gmail.com](jyotinayak1976@gmail.com))
  
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. 
 
-##Overview
+## Overview
 ### Final Project Architecture
 The following is our system architecture diagram showing the ROS nodes and topics used in our final project. The ROS nodes and topics shown in the diagram are described briefly in the component chapters below.
 
