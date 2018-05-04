@@ -15,9 +15,9 @@ class Controller(object):
         self.yaw_controller = YawController(wheel_base,steer_ratio,0.1,max_lat_accel,max_steer_angle)
    
         mn = 0.   # minimum throttle value
-        mx = 0.5  # maximum throttle value
+        mx = 0.2  # maximum throttle value
         self.throttle_controller = PID(kp_throttle,ki_throttle,kd_throttle,mn,mx)
-        band = 1.   # max steering value
+        band = 4.   # max steering value
         self.steering_controller = PID(kp_steer, ki_steer, kd_steer, -band, band)
         self.steering_ratio = steering_ratio
 
@@ -31,6 +31,7 @@ class Controller(object):
         self.decel_limit = decel_limit
         self.accel_limit = accel_limit
         self.wheel_radius = wheel_radius
+        self.max_steer_angle = max_steer_angle
 
         self.last_time = rospy.get_time()
         self.last_vel = 0.
@@ -66,6 +67,10 @@ class Controller(object):
 
         throttle = self.throttle_controller.step(vel_error, sample_time)
         steering += (1. - self.steering_ratio) * self.steering_controller.step(distance, sample_time)
+        if -1. * self.max_steer_angle > steering:
+            steering = -1 * self.max_steer_angle
+        elif self.max_steer_angle < steering:
+            steering = self.max_steer_angle
         brake = 0
 
         if linear_vel == 0 and current_vel < 0.1:
