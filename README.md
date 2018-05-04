@@ -13,7 +13,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 ### Final Project Architecture
 The following is our system architecture diagram showing the ROS nodes and topics used in our final project. The ROS nodes and topics shown in the diagram are described briefly in the component chapters below.
 
-![](imgs\architecture.png)
+![](imgs\final-project-architecture.png)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/final-project-architecture.png)
 
 It includes traffic light detection, control and waypoint following and this is the core functionality of the autonomous vehilce system.
