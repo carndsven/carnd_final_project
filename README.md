@@ -26,9 +26,16 @@ The code for the waypoint updater can be found under [/ros/src/waypoint_updater/
 ![](imgs\waypoint_updater_node.png)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/waypoint_updater_node.png)
 
+If no red traffic light was dedected the full trajectory of parameter `max_lookahead` distance with target velocity will be provided.
+
+![](imgs\waypoint_updater_0.jpg)
+![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/waypoint_updater_0.jpg)
+
 In case of an detected red traffic light the waypoint updater adjust the speed of the car to perform a smooth and save stop in front of the traffic light.
 
-[TBD] Images for result of waypoint updater node: 1 image without and one with traffic light insight
+![](imgs\waypoint_updater_1.jpg)
+![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/waypoint_updater_1.jpg)
+
 
 #### DBW Node Node
 The code for the drive by wire control can be found under [/ros/src/twist_controller/](/ros/src/twist_controller/). It consists of the files for the dbw node `dbw_node.py` and the `twist_controller.py`, which includes a PID and lowpass filter.
@@ -40,10 +47,10 @@ The dbw node will publish throttle, steering and brake commands to the `vehicle/
 The steering controller is a combination of a feed forward control and a distance controller.
 The feed forward control is used to follow the trajectory in general and due to unknown system latencies, model errors, etc. Is it required to add a distance controller which ensures that the controller follows the trajectory in short distance.
 
-The dbw status will be taken into account to reset the controller if the safety driver takes over the control to avoid accumulation errors in the controller.
-
 ![](imgs\dbw.jpg)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/dbw.jpg)
+
+The dbw status will be taken into account to reset the controller if the safety driver takes over the control to avoid accumulation errors in the controller.
 
 #### Traffic Light Detection Node
 
@@ -55,6 +62,7 @@ The dbw status will be taken into account to reset the controller if the safety 
 ![](imgs\traffic_light_detection_node.png)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/traffic_light_detection_node.png)
 
+## Installation
 Please use **one** of the two installation options, either native **or** docker installation.
 
 ### Native Installation
