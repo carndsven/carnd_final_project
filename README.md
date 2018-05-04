@@ -42,11 +42,15 @@ The feed forward control is used to follow the trajectory in general and due to 
 
 The dbw status will be taken into account to reset the controller if the safety driver takes over the control to avoid accumulation errors in the controller.
 
-[TBD] Example image with slight difference between planned and current trajectory.
+![](imgs\dbw.jpg)
+![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/dbw.jpg)
 
 #### Traffic Light Detection Node
 
 [TBD]
+
+![](imgs\tl.jpg)
+![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/tl.jpg)
 
 ![](imgs\traffic_light_detection_node.png)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/traffic_light_detection_node.png)
