@@ -37,7 +37,9 @@ The dbw node will publish throttle, steering and brake commands to the `vehicle/
 ![](imgs\dbw_node.png)
 ![](https://github.com/carndsven/carnd_final_project/blob/master/imgs/dbw_node.png)
 
-The steering controller is a combination of a feed forward control and a distance controler.
+The steering controller is a combination of a feed forward control and a distance controller.
+The feed forward control is used to follow the trajectory in general and due to unknown system latencies, model errors, etc. Is it required to add a distance controller which ensures that the controller follows the trajectory in short distance.
+
 The dbw status will be taken into account to reset the controller if the safety driver takes over the control to avoid accumulation errors in the controller.
 
 [TBD] Example image with slight difference between planned and current trajectory.
