@@ -68,11 +68,11 @@ The 4 main tasks are:
 * Determine state of the traffic light, If the traffic light state is not RED, i.e. YELLOW, GREEN or UNKNOWN, do not intervene.
 * If case closest light is red, publish its waypoint nearest to the stop line to /traffic_waypoint 
 
-![Results on simulated images](imgs\yellow_sim.jpg)
-![Results on simulated images](https://github.com/carndsven/carnd_final_project/blob/master/imgs\yellow_sim.jpg)
+![Simulated data](imgs\yellow_sim.jpg)
+![Simulated data](https://github.com/carndsven/carnd_final_project/blob/master/imgs/yellow_sim.jpg)
 
-![Results on real images](imgs\red_real.jpg)
-![Results on real images](https://github.com/carndsven/carnd_final_project/blob/master/imgs/red_real.jpg)
+![Real images](imgs\red_real.jpg)
+![Real images](https://github.com/carndsven/carnd_final_project/blob/master/imgs/red_real.jpg)
 
 From the topic /base_waypoints on start-up the waypoints are stored. In case of ambiguity this is been used to identify the closest waypoint either to the car's position or a traffic light.
 As soon as the waypoints fo the vehicle and the traffic lights are identfied, it is only an iterating process of the waypoints to tag the closest traffic light waypoint.
