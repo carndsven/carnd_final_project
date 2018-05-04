@@ -13,19 +13,12 @@ class Controller(object):
         kp_throttle, ki_throttle, kd_throttle, kp_steer, ki_steer, kd_steer, steering_ratio):
         # TODO: Implement
         self.yaw_controller = YawController(wheel_base,steer_ratio,0.1,max_lat_accel,max_steer_angle)
-        
-        kp = 0.3
-        ki = 0.1
-        kd = 0.
+   
         mn = 0.   # minimum throttle value
         mx = 0.5  # maximum throttle value
-        self.throttle_controller = PID(kp,ki,kd,mn,mx)
-
-        kp = 1.
-        ki = 0.
-        kd = 0.1
+        self.throttle_controller = PID(kp_throttle,ki_throttle,kd_throttle,mn,mx)
         band = 1.   # max steering value
-        self.steering_controller = PID(kp, ki, kd, -band, band)
+        self.steering_controller = PID(kp_steer, ki_steer, kd_steer, -band, band)
         self.steering_ratio = steering_ratio
 
         tau = 0.5 # 1/(2pi *tau) = cutoff frequency
@@ -83,7 +76,6 @@ class Controller(object):
             throttle = 0
             decel = max(vel_error, self.decel_limit)
             brake = abs(decel)*self.vehicle_mass * self.wheel_radius   # Torque N*m
-        
         return throttle, brake, steering 
 
 
