@@ -2,7 +2,7 @@
 
 ### Teammembers:
 
-* Sven-Garrit Czarnian ([Sven-Garrit.Czarnian@hella.com](Sven-Garrit.Czarnian@hella.com))
+* Sven-Garrit Czarnian ([Sven-Garrit.Czarnian@hella.com](Sven-Garrit.Czarnian@hella.com)) (Team leader)
 * Tina Wein ([tina.wein@hella.com](tina.wein@hella.com))
 * Thomas Götz ([Thomas.Goetz@tgoetz.net](Thomas.Goetz@tgoetz.net))
 * Jyoti Nayak ([jyotinayak1976@gmail.com](jyotinayak1976@gmail.com))
